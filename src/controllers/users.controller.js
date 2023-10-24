@@ -53,10 +53,13 @@ const update = async (req, res) => {
     });
   } else {
     try {
-      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-      });
+      const user = await User.findById(req.params.id);
+
+      updateParams.forEach(
+        (updateParam) => (user[updateParam] = req.body[updateParam])
+      );
+
+      await user.save();
 
       if (!user) {
         return res.status(404).send({ error: "Resource Not Found" });
