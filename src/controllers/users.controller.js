@@ -1,5 +1,18 @@
 const User = require("../models/user.model");
 
+const login = async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+
+    res.send(user);
+  } catch (e) {
+    res.status(400).send({ error: e.message });
+  }
+};
+
 const list = async (req, res) => {
   try {
     const users = await User.find({});
@@ -87,6 +100,7 @@ const destroy = async (req, res) => {
 };
 
 module.exports = {
+  login,
   list,
   show,
   create,
