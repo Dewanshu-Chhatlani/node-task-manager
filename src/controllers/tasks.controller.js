@@ -2,10 +2,11 @@ const Task = require("../models/task.model");
 
 const list = async (req, res) => {
   try {
-    const tasks = await Task.find({});
+    const tasks = await Task.find({ owner: req.user._id });
+
     res.send(tasks);
   } catch (e) {
-    res.status(500).send(e);
+    res.status(500).send({ error: e.message });
   }
 };
 
@@ -14,15 +15,15 @@ const show = async (req, res) => {
 
   if (_id.match(/^[0-9a-fA-F]{24}$/)) {
     try {
-      const task = await Task.findById(_id);
+      const task = await Task.findOne({ _id, owner: req.user._id });
 
       if (!task) {
-        res.status(404).send({ error: "Resource Not Found" });
-      } else {
-        res.send(task);
+        return res.status(404).send({ error: "Resource Not Found" });
       }
+
+      res.send(task);
     } catch (e) {
-      res.status(500).send(e);
+      res.status(500).send({ error: e.message });
     }
   } else {
     res.status(422).send({ error: "Invalid parameter: id" });
@@ -30,12 +31,14 @@ const show = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const task = new Task(req.body);
+  const task = new Task({ ...req.body, owner: req.user._id });
+
   try {
     await task.save();
+
     res.status(201).send(task);
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send({ error: e.message });
   }
 };
 
@@ -52,7 +55,14 @@ const update = async (req, res) => {
     });
   } else {
     try {
-      const task = await Task.findById(req.params.id);
+      const task = await Task.findOne({
+        _id: req.params.id,
+        owner: req.user._id,
+      });
+
+      if (!task) {
+        return res.status(404).send({ error: "Resource Not Found" });
+      }
 
       updateParams.forEach(
         (updateParam) => (task[updateParam] = req.body[updateParam])
@@ -60,28 +70,27 @@ const update = async (req, res) => {
 
       await task.save();
 
-      if (!task) {
-        return res.status(404).send({ error: "Resource Not Found" });
-      }
-
       return res.send(task);
     } catch (e) {
-      res.status(400).send(e);
+      res.status(400).send({ error: e.message });
     }
   }
 };
 
 const destroy = async (req, res) => {
   try {
-    const task = await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user._id,
+    });
 
     if (!task) {
-      res.status(404).send({ error: "Resource Not Found" });
-    } else {
-      res.send(task);
+      return res.status(404).send({ error: "Resource Not Found" });
     }
+
+    res.send(task);
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send({ error: e.message });
   }
 };
 
