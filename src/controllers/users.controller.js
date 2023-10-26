@@ -45,26 +45,6 @@ const profile = async (req, res) => {
   res.send({ user: req.user });
 };
 
-const show = async (req, res) => {
-  const _id = req.params.id;
-
-  if (_id.match(/^[0-9a-fA-F]{24}$/)) {
-    try {
-      const user = await User.findById(_id);
-
-      if (!user) {
-        res.status(404).send({ error: "Resource Not Found" });
-      } else {
-        res.send(user);
-      }
-    } catch (e) {
-      res.status(500).send(e);
-    }
-  } else {
-    res.status(422).send({ error: "Invalid parameter id" });
-  }
-};
-
 const create = async (req, res) => {
   const user = new User(req.body);
 
@@ -75,7 +55,7 @@ const create = async (req, res) => {
 
     res.status(201).send({ user, token });
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send({ error: e.message });
   }
 };
 
@@ -92,36 +72,26 @@ const update = async (req, res) => {
     });
   } else {
     try {
-      const user = await User.findById(req.params.id);
-
       updateParams.forEach(
-        (updateParam) => (user[updateParam] = req.body[updateParam])
+        (updateParam) => (req.user[updateParam] = req.body[updateParam])
       );
 
-      await user.save();
+      await req.user.save();
 
-      if (!user) {
-        return res.status(404).send({ error: "Resource Not Found" });
-      }
-
-      return res.send(user);
+      return res.send(req.user);
     } catch (e) {
-      res.status(400).send(e);
+      res.status(400).send({ error: e.message });
     }
   }
 };
 
 const destroy = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    await req.user.deleteOne();
 
-    if (!user) {
-      res.status(404).send({ error: "Resource Not Found" });
-    } else {
-      res.send(user);
-    }
+    res.send(req.user);
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send({ error: e.message });
   }
 };
 
@@ -130,7 +100,6 @@ module.exports = {
   logout,
   logoutAll,
   profile,
-  show,
   create,
   update,
   destroy,

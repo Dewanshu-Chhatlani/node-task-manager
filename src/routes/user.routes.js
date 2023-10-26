@@ -6,12 +6,11 @@ const router = new express.Router();
 const UsersController = require("../controllers/users.controller");
 
 router.route("/login").post(UsersController.login);
+router.route("/sign_up").post(UsersController.create);
 router.route("/logout").post(auth, UsersController.logout);
 router.route("/logoutAll").post(auth, UsersController.logoutAll);
 router.route("/me").get(auth, UsersController.profile);
-router.route("/:id").get(UsersController.show);
-router.route("/").post(UsersController.create);
-router.route("/:id").patch(UsersController.update);
-router.route("/:id").delete(UsersController.destroy);
+router.route("/").patch(auth, UsersController.update);
+router.route("/").delete(auth, UsersController.destroy);
 
 module.exports = router;
