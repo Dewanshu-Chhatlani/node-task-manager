@@ -15,6 +15,32 @@ const login = async (req, res) => {
   }
 };
 
+const logout = async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter(
+      (token) => token.token !== req.token
+    );
+
+    await req.user.save();
+
+    res.send({ message: "Logged out!" });
+  } catch (e) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
+const logoutAll = async (req, res) => {
+  try {
+    req.user.tokens = [];
+
+    await req.user.save();
+
+    res.send({ message: "Logged out!" });
+  } catch (e) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
 const profile = async (req, res) => {
   res.send({ user: req.user });
 };
@@ -101,6 +127,8 @@ const destroy = async (req, res) => {
 
 module.exports = {
   login,
+  logout,
+  logoutAll,
   profile,
   show,
   create,

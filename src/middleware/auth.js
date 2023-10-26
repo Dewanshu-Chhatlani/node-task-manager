@@ -12,8 +12,9 @@ const auth = async (req, res, next) => {
       "tokens.token": token,
     });
 
-    if (!user) throw new Error("Invalid Token1");
+    if (!user) throw new Error("Invalid Token!");
 
+    req.token = token;
     req.user = user;
 
     next();
