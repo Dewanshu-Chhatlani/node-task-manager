@@ -15,13 +15,8 @@ const login = async (req, res) => {
   }
 };
 
-const list = async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (e) {
-    res.status(500).send(e);
-  }
+const profile = async (req, res) => {
+  res.send({ user: req.user });
 };
 
 const show = async (req, res) => {
@@ -106,7 +101,7 @@ const destroy = async (req, res) => {
 
 module.exports = {
   login,
-  list,
+  profile,
   show,
   create,
   update,
