@@ -1,8 +1,27 @@
 const Task = require("../models/task.model");
 
 const list = async (req, res) => {
+  const conditions = { owner: req.user._id };
+
+  if (req.query.completed) {
+    conditions.completed = req.query.completed === "true";
+  }
+
+  const perPage = req.query.perPage ? parseInt(req.query.perPage) : 10;
+  const page = req.query.page ? parseInt(req.query.page) : 1;
+
+  const sortCondition = {};
+
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(":");
+    sortCondition[parts[0]] = parts[1];
+  }
+
   try {
-    const tasks = await Task.find({ owner: req.user._id });
+    const tasks = await Task.find(conditions)
+      .limit(perPage)
+      .skip(perPage * (page - 1))
+      .sort(sortCondition);
 
     res.send(tasks);
   } catch (e) {
