@@ -15,10 +15,12 @@ router.route("/me").get(auth, UsersController.profile);
 router
   .route("/me/avatar")
   .post(
+    auth,
     fileUploads.avatar,
     UsersController.profileAvatar,
     errorHandlers.handleExpressErrors
   );
+router.route("/me/avatar").delete(auth, UsersController.deleteProfileAvatar);
 router.route("/").patch(auth, UsersController.update);
 router.route("/").delete(auth, UsersController.destroy);
 

@@ -46,7 +46,27 @@ const profile = async (req, res) => {
 };
 
 const profileAvatar = async (req, res) => {
-  res.send();
+  try {
+    req.user.avatar = req.file.buffer;
+
+    await req.user.save();
+
+    res.send({ message: "Avatar uploaded successfully!" });
+  } catch (e) {
+    res.status(400).send({ error: e.message });
+  }
+};
+
+const deleteProfileAvatar = async (req, res) => {
+  try {
+    req.user.avatar = null;
+
+    await req.user.save();
+
+    res.send({ message: "Avatar deleted successfully!" });
+  } catch (e) {
+    res.status(400).send({ error: e.message });
+  }
 };
 
 const create = async (req, res) => {
@@ -105,6 +125,7 @@ module.exports = {
   logoutAll,
   profile,
   profileAvatar,
+  deleteProfileAvatar,
   create,
   update,
   destroy,

@@ -1,7 +1,6 @@
 const multer = require("multer");
 
 const avatarUpload = multer({
-  dest: "src/assets/images",
   limits: {
     fileSize: 1000000,
   },
