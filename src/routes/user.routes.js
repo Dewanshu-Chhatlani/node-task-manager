@@ -17,9 +17,10 @@ router
   .post(
     auth,
     fileUploads.avatar,
-    UsersController.profileAvatar,
+    UsersController.setProfileAvatar,
     errorHandlers.handleExpressErrors
   );
+router.route("/:id/avatar").get(UsersController.getProfileAvatar);
 router.route("/me/avatar").delete(auth, UsersController.deleteProfileAvatar);
 router.route("/").patch(auth, UsersController.update);
 router.route("/").delete(auth, UsersController.destroy);

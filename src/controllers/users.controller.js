@@ -1,3 +1,5 @@
+const sharp = require("sharp");
+
 const User = require("../models/user.model");
 
 const login = async (req, res) => {
@@ -45,13 +47,33 @@ const profile = async (req, res) => {
   res.send({ user: req.user });
 };
 
-const profileAvatar = async (req, res) => {
+const setProfileAvatar = async (req, res) => {
   try {
-    req.user.avatar = req.file.buffer;
+    const buffer = await sharp(req.file.buffer)
+      .resize({ width: 250, height: 250 })
+      .png()
+      .toBuffer();
+
+    req.user.avatar = buffer;
 
     await req.user.save();
 
     res.send({ message: "Avatar uploaded successfully!" });
+  } catch (e) {
+    res.status(400).send({ error: e.message });
+  }
+};
+
+const getProfileAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || !user.avatar) {
+      throw new Error("User/Avatar not found!");
+    }
+
+    res.set("Content-Type", "image/png");
+    res.send(user.avatar);
   } catch (e) {
     res.status(400).send({ error: e.message });
   }
@@ -124,7 +146,8 @@ module.exports = {
   logout,
   logoutAll,
   profile,
-  profileAvatar,
+  setProfileAvatar,
+  getProfileAvatar,
   deleteProfileAvatar,
   create,
   update,
