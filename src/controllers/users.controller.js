@@ -45,6 +45,10 @@ const profile = async (req, res) => {
   res.send({ user: req.user });
 };
 
+const profileAvatar = async (req, res) => {
+  res.send();
+};
+
 const create = async (req, res) => {
   const user = new User(req.body);
 
@@ -100,6 +104,7 @@ module.exports = {
   logout,
   logoutAll,
   profile,
+  profileAvatar,
   create,
   update,
   destroy,
