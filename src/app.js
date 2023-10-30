@@ -7,7 +7,7 @@ require("./db/mongoose");
 const routes = require("./routes/index");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // Parse request body to JSON
 app.use(express.json());
