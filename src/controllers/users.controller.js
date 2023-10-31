@@ -1,5 +1,6 @@
 const sharp = require("sharp");
 
+const mailer = require("../utils/mailer");
 const User = require("../models/user.model");
 
 const login = async (req, res) => {
@@ -99,6 +100,8 @@ const create = async (req, res) => {
 
     const token = await user.generateAuthToken();
 
+    await mailer.welcomeEmail(user.email);
+
     res.status(201).send({ user, token });
   } catch (e) {
     res.status(400).send({ error: e.message });
@@ -134,6 +137,8 @@ const update = async (req, res) => {
 const destroy = async (req, res) => {
   try {
     await req.user.deleteOne();
+
+    await mailer.deletionEmail(req.user.email);
 
     res.send(req.user);
   } catch (e) {
