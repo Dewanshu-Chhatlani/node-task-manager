@@ -1,4 +1,15 @@
 const mongoose = require("../src/db/mongoose");
 
-// Close mongoose connection after all the test cases are run
-afterAll(() => mongoose.connection.close());
+const User = require("../src/models/user.model");
+const Task = require("../src/models/task.model");
+
+beforeAll(async () => {
+  console.log("Cleaning database before running tests...");
+  await User.deleteMany();
+  await Task.deleteMany();
+});
+
+afterAll(async () => {
+  console.log("Closing MongoDB connection...");
+  await mongoose.connection.close();
+});
