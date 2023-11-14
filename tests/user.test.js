@@ -1,4 +1,5 @@
 const request = require("supertest");
+const mailer = require("../src/utils/mailer");
 const app = require("../src/app");
 const User = require("../src/models/user.model");
 
@@ -12,6 +13,9 @@ const userOne = {
 let authToken = "";
 
 test("Should signup a new user", async () => {
+  const spy = jest.spyOn(mailer, "welcomeEmail");
+  spy.mockReturnValue({});
+
   const response = await request(app)
     .post("/users/sign_up")
     .send(userOne)
@@ -63,6 +67,9 @@ test("Should not get user profile without token", async () => {
 });
 
 test("Should delete user with valid token", async () => {
+  const spy = jest.spyOn(mailer, "deletionEmail");
+  spy.mockReturnValue({});
+
   const response = await request(app)
     .delete("/users")
     .set({ Authorization: `Bearer ${authToken}` })
