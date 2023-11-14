@@ -1,16 +1,29 @@
 const request = require("supertest");
 const app = require("../src/app");
+const User = require("../src/models/user.model");
 
 const userOne = {
   name: "Jack",
   email: "jack.sparrow@gmail.com",
+  age: 22,
   password: "Mypass@123",
 };
 
 let authToken = "";
 
 test("Should signup a new user", async () => {
-  await request(app).post("/users/sign_up").send(userOne).expect(201);
+  const response = await request(app)
+    .post("/users/sign_up")
+    .send(userOne)
+    .expect(201);
+
+  expect(response.body).toMatchObject({
+    user: {
+      name: userOne.name,
+      email: userOne.email,
+      age: userOne.age,
+    },
+  });
 });
 
 test("Should login with valid credentials", async () => {
@@ -20,6 +33,14 @@ test("Should login with valid credentials", async () => {
     .expect(200);
 
   authToken = response.body.token;
+
+  expect(response.body).toMatchObject({
+    user: {
+      name: userOne.name,
+      email: userOne.email,
+      age: userOne.age,
+    },
+  });
 });
 
 test("Should not login with invalid credentials", async () => {
@@ -42,11 +63,15 @@ test("Should not get user profile without token", async () => {
 });
 
 test("Should delete user with valid token", async () => {
-  await request(app)
+  const response = await request(app)
     .delete("/users")
     .set({ Authorization: `Bearer ${authToken}` })
     .send()
     .expect(200);
+
+  const user = await User.findById(response.body._id);
+
+  expect(user).toBeNull();
 });
 
 test("Should not delete user without token", async () => {
