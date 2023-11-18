@@ -66,6 +66,14 @@ test("Should not get user profile without token", async () => {
   await request(app).get("/users/me").send().expect(401);
 });
 
+test("Should upload avatar image", async () => {
+  await request(app)
+    .post("/users/me/avatar")
+    .set({ Authorization: `Bearer ${authToken}` })
+    .attach("avatar", "tests/fixtures/profile.jpg")
+    .expect(200);
+});
+
 test("Should delete user with valid token", async () => {
   const spy = jest.spyOn(mailer, "deletionEmail");
   spy.mockReturnValue({});
